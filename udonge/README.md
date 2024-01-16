@@ -16,3 +16,6 @@ PRUNE_RESTIC_RETENTION=--keep-daily 7 --keep-weekly 5 --keep-monthly 12 --keep-y
 GITHUB_TOKEN=
 REPOSILITE_PLUGINS_TOKEN=
 ```
+
+<a href="https://twitter.com/JeanBomjan/status/1479490907313483777">Udonge Stack... (Source)</a><br>
+![image](https://github.com/Gensokyo-Reimagined/docker-myonpose/assets/67013996/ff4fecef-5739-4a57-b7c3-cda8c2178d28)
