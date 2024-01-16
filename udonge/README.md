@@ -1,4 +1,7 @@
-## environment variables
+## udonge
+This stack maintains the proxy and minecraft servers
+
+### environment variables
 
 ```properties
 DIR_MINECRAFT=/opt/docker/data/minecraft/
