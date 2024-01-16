@@ -70,6 +70,23 @@ services:
     # labels:
       # <<: [*daily-restarts]
 
+  # minecraft-mmo:
+  #   image: ghcr.io/gensokyo-reimagined/minecraft:master
+  #   <<: *velocity-network
+  #   environment:
+  #     <<: *minecraft-env-defaults
+  #     SERVER_NAME: "mmo"
+  #     VERSION: "1.20.2"
+  #     MEMORY: "14G"
+  #     ANSIBLE_PULL_BRANCH: main
+  #     EXTRA_ARGS: '--world-container ./worlds/'
+  #     GITHUB_TOKEN: ${GITHUB_TOKEN}
+  #   volumes:
+  #     - "${DIR_MINECRAFT}/mmo:/data"
+  #     - "${DIR_CONFIGS}/mmo:/server-config"
+  #   labels:
+  #     <<: [*daily-restarts]
+
 #   minecraft-survival:
 #     image: ghcr.io/gensokyo-reimagined/minecraft:master
 #     <<: *velocity-network
