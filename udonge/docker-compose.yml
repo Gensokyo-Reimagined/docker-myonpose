@@ -56,7 +56,7 @@ services:
       <<: *minecraft-env-defaults
       SERVER_NAME: "build"
       VERSION: "1.20.2"
-      MEMORY: "6G"
+      MEMORY: "1G"
       ANSIBLE_PULL_BRANCH: main
       EXTRA_ARGS: '--world-container ./worlds/'
       GITHUB_TOKEN: ${GITHUB_TOKEN}
@@ -77,7 +77,7 @@ services:
   #     <<: *minecraft-env-defaults
   #     SERVER_NAME: "mmo"
   #     VERSION: "1.20.2"
-  #     MEMORY: "14G"
+  #     MEMORY: "16G"
   #     ANSIBLE_PULL_BRANCH: main
   #     EXTRA_ARGS: '--world-container ./worlds/'
   #     GITHUB_TOKEN: ${GITHUB_TOKEN}
@@ -95,7 +95,7 @@ services:
 #       SERVER_NAME: "survival"
 #       VERSION: "1.19.2"
 #       PAPERBUILD: "172"
-#       MEMORY: "14G"
+#       MEMORY: "8G"
 #       KEEPUP: "false"
 #       ANSIBLE_PULL_BRANCH: master
 #       EXTRA_ARGS: '--world-container ./worlds/'
