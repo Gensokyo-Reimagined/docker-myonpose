@@ -1,10 +1,10 @@
 version: '1.1'
 
-# x-labels-backups-env: &default-backups-env
-#   RCON_PASSWORD: ${RCON_PASSWORD}
-#   BACKUP_METHOD: restic
-#   INITIAL_DELAY: 10
-#   PRUNE_RESTIC_RETENTION: ${PRUNE_RESTIC_RETENTION}
+x-labels-backups-env: &default-backups-env
+  RCON_PASSWORD: ${RCON_PASSWORD}
+  BACKUP_METHOD: restic
+  INITIAL_DELAY: 10
+  PRUNE_RESTIC_RETENTION: ${PRUNE_RESTIC_RETENTION}
 
 # x-labels-daily-restarts: &daily-restarts
 #   ofelia.enabled: "true"
@@ -127,19 +127,20 @@ services:
 #       - "archive-worlds-overlay:/data/worlds"
 #       - "${DIR_CONFIGS}/archive:/server-config"
 
-#   backup-build:
-#     image: itzg/mc-backup
-#     networks:
-#       - minecraft
-#     environment:
-#       <<: *default-backups-env
-#       RCON_HOST: minecraft-build
-#       RESTIC_PASSWORD: ${RESTIC_PASWORD_BUILD}
-#       RESTIC_REPOSITORY: rclone:backup:build
-#       BACKUP_NAME: build-worlds
-#     volumes:
-#       - ${BACKUPS_RCLONE_CONF}:/config/rclone/rclone.conf:ro
-#       - ${DIR_MINECRAFT}/build/worlds/world:/data/world:ro
+  backup-build:
+    image: itzg/mc-backup
+    networks:
+      - minecraft
+      - keine_monitor
+    environment:
+      <<: *default-backups-env
+      RCON_HOST: minecraft-build
+      RESTIC_PASSWORD: ${RESTIC_PASSWORD_BUILD}
+      RESTIC_REPOSITORY: rclone:backups:backups
+      BACKUP_NAME: build-worlds
+    volumes:
+      - ${BACKUPS_RCLONE_CONF}:/config/rclone/rclone.conf:ro
+      - ${DIR_MINECRAFT}/build/worlds/world:/data/world:ro
 
 #   backup-survival:
 #     image: itzg/mc-backup
