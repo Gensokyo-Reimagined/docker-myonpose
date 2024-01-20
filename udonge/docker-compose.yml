@@ -45,6 +45,7 @@ services:
     environment:
       SERVER_NAME: "velocity"
       TYPE: VELOCITY
+      VELOCITY_VERSION: "3.2.0-SNAPSHOT"
       MEMORY: "512m"
       ANSIBLE_PULL_BRANCH: main
       GITHUB_TOKEN: ${GITHUB_TOKEN}
@@ -156,20 +157,25 @@ services:
 #       - ${BACKUPS_RCLONE_CONF}:/config/rclone/rclone.conf:ro
 #       - ${DIR_MINECRAFT}/survival/worlds/world:/data/world:ro
 
-#   mysql:
-#     image: mysql
-#     networks:
-#       - minecraft
-#     volumes:
-#       - mysql:/var/lib/mysql
-#       - /opt/docker/compose/config/schema-migrations/:/docker-entrypoint-initdb.d:ro
-#     environment:
-#       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-#     restart: unless-stopped
-# volumes:
-#   filebrowser:
-#   mysql:
-#   # Non-persisting volume for archive worlds (we can delete the overlay any time to revert to the original files)
+  mysql:
+    image: mysql
+    networks:
+      - minecraft
+    volumes:
+      - mysql:/var/lib/mysql
+      - /opt/docker/compose/config/schema-migrations/:/docker-entrypoint-initdb.d:ro
+    ports:
+      - "127.0.0.1:3306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: minecraft
+    restart: unless-stopped
+
+
+volumes:
+  filebrowser:
+  mysql:
+    # Non-persisting volume for archive worlds (we can delete the overlay any time to revert to the original files)
 #   archive-worlds-overlay:
 #     driver: local
 #     driver_opts:
