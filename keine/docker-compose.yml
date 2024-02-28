@@ -20,6 +20,7 @@ services:
       traefik.http.routers.grafana.service: grafana
       traefik.http.routers.grafana.middlewares: oauth@file
       traefik.http.services.grafana.loadbalancer.server.port: 3000
+      traefik.docker.network: compose_traefik
     networks: [monitor, compose_traefik]
 
   cadvisor:

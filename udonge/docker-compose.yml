@@ -15,6 +15,7 @@ x-service-velocity-defaults: &velocity-network
   networks:
     - minecraft
     - keine_monitor
+    - compose_traefik
   restart: unless-stopped
   tty: true
   stdin_open: true
@@ -23,13 +24,18 @@ x-service-velocity-defaults: &velocity-network
 
 x-environment-minecraft-defaults: &minecraft-env-defaults
   EULA: "TRUE"
-  TYPE: "PURPUR"
+  TYPE: "CUSTOM"
+  CUSTOM_SERVER: "https://github.com/vectrix-space/ignite/releases/latest/download/ignite.jar"
+  USE_IGNITE_LOADER: "true"
+  # TYPE: "PURPUR"
   EXEC_DIRECTLY: "TRUE"
-  USE_AIKAR_FLAGS: "TRUE"
+  # USE_AIKAR_FLAGS: "TRUE"
+  JVM_OPTS: ${JVM_OPTS}
   ONLINE_MODE: "FALSE"
   ENFORCE_SECURE_PROFILE: "FALSE"
   RCON_PASSWORD: ${RCON_PASSWORD}
   REPOSILITE_PLUGINS_TOKEN: ${REPOSILITE_PLUGINS_TOKEN}
+  MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
 
 services:
 
@@ -37,37 +43,58 @@ services:
     <<: *velocity-network
     image: ghcr.io/gensokyo-reimagined/proxy:master
     ports:
-      # - "25565:25577"
-      - "42069:25577"
+      - "25565:25577"
     volumes:
       - "${DIR_MINECRAFT}/velocity:/server"
       - "${DIR_CONFIGS}/velocity:/server-config"
     environment:
       SERVER_NAME: "velocity"
       TYPE: VELOCITY
-      VELOCITY_VERSION: "3.2.0-SNAPSHOT"
-      MEMORY: "512m"
+      VELOCITY_VERSION: "3.3.0-SNAPSHOT"
+      VELOCITY_BUILD_ID: "343"
+      MEMORY: "4096m"
       ANSIBLE_PULL_BRANCH: main
       GITHUB_TOKEN: ${GITHUB_TOKEN}
+    sysctls:
+      - net.ipv4.tcp_congestion_control=bbr
 
   minecraft-build:
-    image: ghcr.io/gensokyo-reimagined/minecraft:master
+    image: ghcr.io/gensokyo-reimagined/ignite:master
     <<: *velocity-network
     environment:
       <<: *minecraft-env-defaults
       SERVER_NAME: "build"
-      VERSION: "1.20.2"
-      MEMORY: "1G"
+      VERSION: "1.20.4"
+      MEMORY: "32G"
       ANSIBLE_PULL_BRANCH: main
       EXTRA_ARGS: '--world-container ./worlds/'
       GITHUB_TOKEN: ${GITHUB_TOKEN}
     volumes:
       - "${DIR_MINECRAFT}/build:/data"
       - "${DIR_CONFIGS}/build:/server-config"
+      - "${DIR_DOCKER_DATA}/bbmodels/blueprints:/plugins/ModelEngine/blueprints"
     build:
       context: .
       secrets:
         - velocity_forwarding_secret
+    labels:
+      traefik.enable: 'true'
+      traefik.docker.network: compose_traefik
+      
+      traefik.http.routers.minecraft-build.rule: Host(`build.pack.gensokyoreimagined.net`)
+      traefik.http.routers.minecraft-build.entrypoints: websecure
+      traefik.http.routers.minecraft-build.tls.certresolver: letsencrypt
+      traefik.http.routers.minecraft-build.service: minecraft-build
+      traefik.http.services.minecraft-build.loadbalancer.server.port: 8082
+
+      traefik.http.routers.minecraft-build-map.rule: Host(`map.gensokyoreimagined.net`)
+      traefik.http.routers.minecraft-build-map.entrypoints: websecure
+      traefik.http.routers.minecraft-build-map.tls.certresolver: letsencrypt
+      traefik.http.routers.minecraft-build-map.service: minecraft-build-map-service
+      traefik.http.services.minecraft-build-map-service.loadbalancer.server.port: 8080
+    sysctls:
+      - net.ipv4.tcp_congestion_control=bbr
+      
     # labels:
       # <<: [*daily-restarts]
 
@@ -77,7 +104,7 @@ services:
   #   environment:
   #     <<: *minecraft-env-defaults
   #     SERVER_NAME: "mmo"
-  #     VERSION: "1.20.2"
+  #     VERSION: "1.20.4"
   #     MEMORY: "16G"
   #     ANSIBLE_PULL_BRANCH: main
   #     EXTRA_ARGS: '--world-container ./worlds/'
@@ -85,6 +112,7 @@ services:
   #   volumes:
   #     - "${DIR_MINECRAFT}/mmo:/data"
   #     - "${DIR_CONFIGS}/mmo:/server-config"
+  #     - "${DIR_DOCKER_DATA}/bbmodels/blueprints:/plugins/ModelEngine/blueprints"
   #   labels:
   #     <<: [*daily-restarts]
 
@@ -94,7 +122,7 @@ services:
 #     environment:
 #       <<: *minecraft-env-defaults
 #       SERVER_NAME: "survival"
-#       VERSION: "1.19.2"
+#       VERSION: "1.20.4"
 #       PAPERBUILD: "172"
 #       MEMORY: "8G"
 #       KEEPUP: "false"
@@ -103,6 +131,7 @@ services:
 #     volumes:
 #       - "${DIR_MINECRAFT}/survival:/data"
 #       - "${DIR_CONFIGS}/survival:/server-config"
+#       - "${DIR_DOCKER_DATA}/bbmodels/blueprints:/plugins/ModelEngine/blueprints"
 #     labels:
 #       <<: [*daily-restarts]
 
@@ -114,7 +143,7 @@ services:
 #       <<: *minecraft-env-defaults
 #       SERVER_NAME: "archive"
 #       EXEC_DIRECTLY: "false"
-#       VERSION: "1.20.2"
+#       VERSION: "1.20.4"
 #       MEMORY: "3G"
 #       ENABLE_AUTOPAUSE: "TRUE"
 #       OVERRIDE_SERVER_PROPERTIES: "TRUE"
