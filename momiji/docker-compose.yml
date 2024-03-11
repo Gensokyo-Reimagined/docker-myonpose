@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  voxy:
+    image: itzg/minecraft-server
+    restart: unless-stopped
+    tty: true
+    stdin_open: true
+    ports:
+      - "42069:25565"
+    environment:
+      EULA: "TRUE"
+      SERVER_NAME: "voxy"
+      TYPE: "FABRIC"
+      LEVEL_TYPE: "minecraft:flat"
+      MAX_WORLD_SIZE: "5"
+      MEMORY: "8G"
+      ENABLE_WHITELIST: true
+      EXEC_DIRECTLY: true
+    networks:
+      - "momiji_voxy"
+    volumes:
+      - "${DIR_MINECRAFT}/voxy:/data"
+      - "${DIR_CONFIGS}/voxy:/server-config"
+
+  db:
+    image: redis:alpine
+    restart: always
+    ports:
+      - "6379:6379"
+    command: redis-server --save 60 1 --loglevel warning
+    networks:
+      - "momiji_voxy"
+    volumes:
+      - "${DIR_DOCKER_DATA}/voxy:/data"
+
+networks:
+  momiji_voxy:
